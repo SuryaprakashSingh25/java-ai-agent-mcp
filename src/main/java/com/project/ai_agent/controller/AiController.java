@@ -1,6 +1,8 @@
 package com.project.ai_agent.controller;
 
 import com.project.ai_agent.dto.ChatRequest;
+import com.project.ai_agent.dto.ChatResponse;
+import jakarta.validation.Valid;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,11 +16,13 @@ public class AiController {
     }
 
     @PostMapping("/chat")
-    public String chat(@RequestBody ChatRequest request){
-        return chatClient
+    public ChatResponse chat(@Valid @RequestBody ChatRequest request){
+        String response=chatClient
                 .prompt(request.message())
                 .call()
                 .content();
+
+        return new ChatResponse(response);
     }
 
 }
