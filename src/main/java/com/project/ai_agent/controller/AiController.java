@@ -1,10 +1,11 @@
 package com.project.ai_agent.controller;
 
+import com.project.ai_agent.dto.ChatRequest;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/api")
 public class AiController {
     private final ChatClient chatClient;
 
@@ -12,10 +13,10 @@ public class AiController {
         this.chatClient=chatClientBuilder.build();
     }
 
-    @GetMapping("/api/hello-ai")
-    public String helloAi(){
+    @PostMapping("/chat")
+    public String chat(@RequestBody ChatRequest request){
         return chatClient
-                .prompt("Explain what is AI in one sentence.")
+                .prompt(request.message())
                 .call()
                 .content();
     }
