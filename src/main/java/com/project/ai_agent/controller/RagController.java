@@ -1,5 +1,9 @@
 package com.project.ai_agent.controller;
 
+import com.project.ai_agent.dto.RagRequest;
+import com.project.ai_agent.dto.RagResponse;
+import com.project.ai_agent.service.RagService;
+import jakarta.validation.Valid;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -14,35 +18,15 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/rag")
 public class RagController {
-    private final ChatClient chatClient;
-    private final VectorStore vectorStore;
+    private final RagService ragService;
 
-    public RagController(ChatClient.Builder chatClientBuilder,
-                         VectorStore vectorStore){
-        this.chatClient=chatClientBuilder.build();
-        this.vectorStore=vectorStore;
+    public RagController(RagService ragService){
+        this.ragService=ragService;
     }
 
     @PostMapping
-    public String ask(@RequestBody String question){
-        List<Document> documents=vectorStore.similaritySearch(question);
-
-        String context=documents.stream()
-                .map(Document::getText)
-                .collect(Collectors.joining("\n\n"));
-
-        return chatClient
-                .prompt()
-                .system("""
-                        Answer the user's question using only the provided context.
-                        If the answer cannot be found in the context, say:
-                        "I don't have enough information in the provided context."
-                        
-                        Context:
-                        %s
-                        """.formatted(context))
-                .user(question)
-                .call()
-                .content();
+    public RagResponse ask(@Valid @RequestBody RagRequest request){
+        String answer=ragService.answer(request.question());
+        return new RagResponse(answer);
     }
 }
