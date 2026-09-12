@@ -2,6 +2,7 @@ package com.project.ai_agent.service;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,14 @@ public class RagService {
     }
 
     public String answer(String question){
-        List<Document> documents=vectorStore.similaritySearch(question);
+
+        SearchRequest searchRequest=SearchRequest.builder()
+                .query(question)
+                .topK(3)
+                .similarityThreshold(0.7)
+                .build();
+
+        List<Document> documents=vectorStore.similaritySearch(searchRequest);
 
         String context=documents.stream()
                 .map(Document::getText)
