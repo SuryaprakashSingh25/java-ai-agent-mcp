@@ -1,6 +1,7 @@
 package com.project.ai_agent.controller;
 
 import org.springframework.ai.document.Document;
+import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +23,16 @@ public class DocumentController {
                 content,
                 Map.of("source","manual")
         );
-        vectorStore.add(List.of(document));
+        TokenTextSplitter splitter = new TokenTextSplitter(
+                500,
+                200,
+                20,
+                10000,
+                true,
+                List.of('.', '?', '!')
+        );
+        List<Document> chunks=splitter.apply(List.of(document));
+        vectorStore.add(chunks);
         return "Document added successfully";
     }
 
