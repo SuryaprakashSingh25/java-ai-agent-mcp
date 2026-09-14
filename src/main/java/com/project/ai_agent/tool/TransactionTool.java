@@ -16,8 +16,19 @@ public class TransactionTool {
     );
 
     @Tool(description = "Get the status of a transaction using its transaction ID")
-    public TransactionResult getTransactionStatus(String transactionId){
+    public String getTransactionStatus(String transactionId){
         Transaction transaction=transactions.get(transactionId);
+        if (transaction == null) {
+            return "Transaction not found";
+        }
+
+        return transaction.status();
+    }
+
+    @Tool(description = "Get complete transaction details including transaction ID, status, amount and currency")
+    public TransactionResult getTransactionDetails(String transactionId){
+        Transaction transaction=transactions.get(transactionId);
+
         if(transaction==null){
             return new TransactionResult(
                     false,
@@ -31,4 +42,5 @@ public class TransactionTool {
                 "Transaction found"
         );
     }
+
 }
